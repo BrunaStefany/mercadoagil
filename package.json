@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/BrunaStefany/mercadoagil/issues"
   },
-  "homepage": "https://github.com/BrunaStefany/mercadoagil#readme"
+  "homepage": "https://github.com/BrunaStefany/mercadoagil#readme",
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
 }
