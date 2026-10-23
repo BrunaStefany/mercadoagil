@@ -4,14 +4,16 @@ export class Estoque {
   // define quanto tem de cada produto
   definirQuantidade(produtoId, quantidade) {
     this.#quantidades = { ...this.#quantidades, [produtoId]: quantidade };
-}
-  
-// consulta quanto tem de cada produto (0 se o produto nunca foi cadastrado)
+  }
+
+  // consulta quanto tem de cada produto (0 se o produto nunca foi cadastrado)
   obterQuantidade(produtoId) {
     return this.#quantidades[produtoId] ?? 0;
   }
-    // verifica se é possível atender a quant. pedida por um cliente
-    verificar(itens) {
+
+  // verifica se é possível atender a quant. pedida por um cliente
+  // devolve só os itens que faltam (lista vazia = tudo ok)
+  verificar(itens) {
     return itens
       .filter(({ produtoId, quantidade }) => this.obterQuantidade(produtoId) < quantidade)
       .map(({ produtoId, quantidade }) => ({
@@ -21,35 +23,35 @@ export class Estoque {
       }));
   }
 
+  // tudo ou nada: só retira se TODOS os itens couberem
   darBaixa(itens) {
-  const faltas = this.verificar(itens);
+    const faltas = this.verificar(itens);
 
-  if (faltas.length > 0) {
-    return {
-      ok: false,
-      erros: faltas,
-    };
+    if (faltas.length > 0) {
+      return { ok: false, erros: faltas };
+    }
+
+    this.#quantidades = itens.reduce(
+      (acumulado, { produtoId, quantidade }) => ({
+        ...acumulado,
+        [produtoId]: (acumulado[produtoId] ?? 0) - quantidade,
+      }),
+      this.#quantidades
+    );
+
+    return { ok: true };
   }
 
-  itens.forEach(({ produtoId, quantidade }) => {
-    this.definirQuantidade(
-      produtoId,
-      this.obterQuantidade(produtoId) - quantidade
+  // cancelamento de pedido confirmado: devolve os itens ao estoque
+  devolver(itens) {
+    this.#quantidades = itens.reduce(
+      (acumulado, { produtoId, quantidade }) => ({
+        ...acumulado,
+        [produtoId]: (acumulado[produtoId] ?? 0) + quantidade,
+      }),
+      this.#quantidades
     );
-  });
 
-  return { ok: true };
-}
-
-devolver(itens) {
-  itens.forEach(({ produtoId, quantidade }) => {
-    this.definirQuantidade(
-      produtoId,
-      this.obterQuantidade(produtoId) + quantidade
-    );
-  });
-
-  return { ok: true };
-}
-
+    return { ok: true };
+  }
 }
