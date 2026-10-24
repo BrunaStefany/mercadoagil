@@ -1,4 +1,5 @@
 import { cupomSchema } from '../schemas/cupomSchema.js';
+import { TETO_DESCONTO, MAX_CUPONS_POR_PEDIDO } from '../config/regras.js';
 
 // Arredonda para 2 casas (evita 14.399999...)
 const arredondar = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -99,7 +100,9 @@ export class CupomDesconto {
   static validarCombinacao(cupons, subtotal, agora = new Date()) {
     const erros = [];
 
-    if (cupons.length > 2) erros.push('Máximo de 2 cupons por pedido.');
+    if (cupons.length > MAX_CUPONS_POR_PEDIDO) {
+      erros.push(`Máximo de ${MAX_CUPONS_POR_PEDIDO} cupons por pedido.`);
+    }
 
     const repetidos = cupons
       .filter((c, i) => cupons.findIndex((outro) => outro.codigo === c.codigo) !== i)
@@ -123,9 +126,9 @@ export class CupomDesconto {
    * o teto: a soma dos descontos nunca passa de 30% do subtotal.
    * Percentual incide sobre o valor ATUAL (já com os descontos anteriores).
    * Cupom de frete não gera desconto em R$: só avisa `zeraFrete`.
-   * O teto deveria vir de config/regras.js; aqui é parâmetro com padrão 30%.
+   * O teto vem de config/regras.js (TETO_DESCONTO); o parâmetro só serve para testes.
    */
-  static calcularDescontos(cupons, subtotal, tetoPercentual = 0.3) {
+  static calcularDescontos(cupons, subtotal, tetoPercentual = TETO_DESCONTO) {
     const tetoTotal = arredondar(subtotal * tetoPercentual);
     const emOrdem = [...cupons].sort((a, b) => a.ordemDeAplicacao - b.ordemDeAplicacao);
 

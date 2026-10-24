@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TIPOS_CUPOM } from '../config/regras.js';
 
 // Schema do cupom. Cada campo tem mensagem de erro em português (rubrica: "Majestoso").
 export const cupomSchema = z
@@ -9,8 +10,8 @@ export const cupomSchema = z
       .min(3, 'O código precisa ter pelo menos 3 letras.')
       .toUpperCase(),
 
-    tipo: z.enum(['percentual', 'fixo', 'frete'], {
-      message: 'O tipo precisa ser: percentual, fixo ou frete.',
+    tipo: z.enum(TIPOS_CUPOM, {
+      message: `O tipo precisa ser: ${TIPOS_CUPOM.join(', ')}.`,
     }),
 
     valor: z
