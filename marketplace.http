@@ -1,0 +1,148 @@
+@baseUrl = http://localhost:3000/api
+@clienteId = 1
+@vendedorId = 1
+@produtoId = 1
+@cupomId = 1
+
+### Saúde: listar cupons demonstra o seed carregado
+GET {{baseUrl}}/cupons
+
+### Cadastrar cliente (CPF é aceito no cadastro, mas nunca volta na resposta)
+POST {{baseUrl}}/clientes
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva",
+  "email": "maria@example.com",
+  "cpf": "12345678901",
+  "regiao": "sudeste"
+}
+
+### Listar clientes
+GET {{baseUrl}}/clientes
+
+### Buscar cliente
+GET {{baseUrl}}/clientes/{{clienteId}}
+
+### Buscar clientes por nome, e-mail ou região
+GET {{baseUrl}}/clientes?busca=maria
+
+### Atualizar dados do cliente (campos enviados são atualizados; CPF permanece privado)
+PUT {{baseUrl}}/clientes/{{clienteId}}
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva Atualizada",
+  "regiao": "sul"
+}
+
+### Cadastrar vendedor
+POST {{baseUrl}}/vendedores
+Content-Type: application/json
+
+{
+  "nomeLoja": "Loja da Maria",
+  "cnpj": "12345678000199",
+  "email": "loja@example.com"
+}
+
+### Listar vendedores
+GET {{baseUrl}}/vendedores
+
+### Buscar vendedor
+GET {{baseUrl}}/vendedores/{{vendedorId}}
+
+### Buscar vendedores
+GET {{baseUrl}}/vendedores?busca=loja
+
+### Atualizar dados do vendedor
+PUT {{baseUrl}}/vendedores/{{vendedorId}}
+Content-Type: application/json
+
+{
+  "nomeLoja": "Loja da Maria Atualizada"
+}
+
+### Cadastrar produto
+POST {{baseUrl}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Fone Bluetooth",
+  "preco": 120,
+  "categoria": "eletronicos",
+  "vendedorId": 1,
+  "estoque": 10
+}
+
+### Listar produtos
+GET {{baseUrl}}/produtos
+
+### Buscar produto
+GET {{baseUrl}}/produtos/{{produtoId}}
+
+### Buscar produtos
+GET {{baseUrl}}/produtos?busca=fone
+
+### Atualizar dados e estoque do produto
+PUT {{baseUrl}}/produtos/{{produtoId}}
+Content-Type: application/json
+
+{
+  "preco": 110,
+  "estoque": 12
+}
+
+### Cadastrar cupom (os cupons de exemplo já vêm do seed)
+POST {{baseUrl}}/cupons
+Content-Type: application/json
+
+{
+  "codigo": "AMIGOS10",
+  "tipo": "percentual",
+  "valor": 10,
+  "validade": "2099-12-31T23:59:59.000Z",
+  "valorMinimo": 0,
+  "cumulativo": true
+}
+
+### Buscar cupom seed
+GET {{baseUrl}}/cupons/{{cupomId}}
+
+### Buscar cupons
+GET {{baseUrl}}/cupons?busca=bemvindo
+
+### Atualizar cupom
+PUT {{baseUrl}}/cupons/{{cupomId}}
+Content-Type: application/json
+
+{
+  "valor": 12
+}
+
+### Criar e confirmar pedido; preço e vendedor são obtidos do cadastro do produto
+POST {{baseUrl}}/pedidos
+Content-Type: application/json
+
+{
+  "clienteId": 1,
+  "itens": [
+    { "produtoId": 1, "quantidade": 2 }
+  ],
+  "cupons": ["BEMVINDO10"]
+}
+
+### Listar pedidos criados
+GET {{baseUrl}}/pedidos
+
+### Excluir cliente
+DELETE {{baseUrl}}/clientes/{{clienteId}}
+
+### Excluir vendedor
+DELETE {{baseUrl}}/vendedores/{{vendedorId}}
+
+### Excluir produto
+DELETE {{baseUrl}}/produtos/{{produtoId}}
+
+### Excluir cupom (cupom seed pode ser excluído normalmente)
+DELETE {{baseUrl}}/cupons/{{cupomId}}
