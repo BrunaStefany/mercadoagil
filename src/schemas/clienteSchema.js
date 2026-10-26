@@ -10,12 +10,11 @@ export const clienteSchema = z.object({
       const cpfLimpo = cpf.replace(/\D/g, '');
       return cpfLimpo.length === 11;
     }, { message: 'Formato de CPF inválido. Utilize 11 dígitos numéricos.' }),
-  
-  // Adicionamos a propriedade "message" e garantimos o errorMap para qualquer cenário do enum
-  regiao: z.enum(['Norte', 'Nordeste', 'Centro-Oeste', 'Sudeste', 'Sul'], {
-    invalid_type_error: 'Região inválida. Escolha entre: Norte, Nordeste, Centro-Oeste, Sudeste ou Sul.',
-    required_error: 'A região de entrega é obrigatória.',
-    message: 'Região inválida. Escolha entre: Norte, Nordeste, Centro-Oeste, Sudeste ou Sul.',
-    errorMap: () => ({ message: 'Região inválida. Escolha entre: Norte, Nordeste, Centro-Oeste, Sudeste ou Sul.' })
-  })
-});
+
+  regiao: z.string().trim().toLowerCase().refine((valor) =>
+    ['norte', 'nordeste', 'centro-oeste', 'sudeste', 'sul'].includes(valor),
+    {
+      message: 'Região inválida. Escolha entre: Norte, Nordeste, Centro-Oeste, Sudeste ou Sul.',
+    }
+  )
+}); 
