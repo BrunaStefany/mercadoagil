@@ -10,13 +10,13 @@ describe('Testes do Modelo e Schema de Cliente', () => {
       nome: 'Maria Silva',
       email: 'maria@email.com',
       cpf: '12345678901',
-      regiao: 'Nordeste'
+      regiao: 'nordeste'
     };
-    
+
     const cliente = new Cliente(dados);
-    
+
     assert.strictEqual(cliente.nome, 'Maria Silva');
-    assert.strictEqual(cliente.regiao, 'Nordeste');
+    assert.strictEqual(cliente.regiao, 'nordeste');
   });
 
   test('Schema deve aprovar dados válidos', () => {
@@ -24,7 +24,7 @@ describe('Testes do Modelo e Schema de Cliente', () => {
       nome: 'João Souza',
       email: 'joao@email.com',
       cpf: '09876543210',
-      regiao: 'Sul'
+      regiao: 'sul'
     };
 
     const resultado = clienteSchema.safeParse(dadosValidos);
@@ -36,7 +36,7 @@ describe('Testes do Modelo e Schema de Cliente', () => {
       nome: 'Ana',
       email: 'ana@email.com',
       cpf: '123', // Inválido
-      regiao: 'Norte'
+      regiao: 'norte'
     };
 
     const resultado = clienteSchema.safeParse(dadosInvalidos);
@@ -49,7 +49,7 @@ describe('Testes do Modelo e Schema de Cliente', () => {
       nome: 'Carlos',
       email: 'carlos@email.com',
       cpf: '11122233344',
-      regiao: 'Exterior' // Inválido
+      regiao: 'exterior'
     };
 
     const resultado = clienteSchema.safeParse(dadosInvalidos);
