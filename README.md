@@ -3,7 +3,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-F7DF1E?logo=javascript&logoColor=black)
 ![Zod](https://img.shields.io/badge/Zod-4-3068B7?logo=zod&logoColor=white)
-![Testes](https://img.shields.io/badge/testes-node%3Atest-43853D)
+![Testes](https://img.shields.io/badge/testes-npm%20test-43853D)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)
 
 Serviço de pedidos de um marketplace, feito em JavaScript puro com Node.js e executado no terminal. Projeto final do Módulo 1 do Programadores do Amanhã, desenvolvido pelo **SQUAD**.
