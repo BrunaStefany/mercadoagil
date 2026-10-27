@@ -1,5 +1,5 @@
-```markdown
-# MercadoÁgil: Microsserviço de Pedidos
+ ```markdown
+# 🛒 MercadoÁgil: Microsserviço de Pedidos
 
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES%20Modules-F7DF1E?logo=javascript&logoColor=black)
@@ -16,7 +16,7 @@ O MercadoÁgil registrava pedidos numa planilha e tinha sempre os mesmos problem
 Requisito: Node.js 18 ou mais novo.
 
 ```bash
-git clone [COLE_O_LINK_DO_SEU_GITHUB_AQUI]
+git clone [https://github.com/BrunaStefany/mercadoagil](https://github.com/BrunaStefany/mercadoagil)
 cd mercadoagil
 npm install
 npm start
@@ -25,8 +25,7 @@ npm start
 
 Ao abrir, o sistema carrega os dados de exemplo (`src/data/seed.js`) e mostra o menu principal:
 
-
-```
+```text
 1. Clientes   2. Vendedores   3. Produtos   4. Cupons   5. Pedidos   6. Relatórios   0. Sair
 
 ```
@@ -76,8 +75,6 @@ npm test
 3. **Frete por último:** o cupom de frete zera o frete e não entra na conta do desconto.
 4. **Teto:** a soma de percentuais e fixos é cortada em 30% do subtotal.
 
-Por que essa ordem: aplicar o percentual antes do valor fixo dá o mesmo resultado para qualquer ordem em que os cupons são digitados, então o total não depende do atendente.
-
 ### Frete
 
 `taxa da região + R$ 1,50 por unidade`, um só por pedido, mesmo com vendedores diferentes.
@@ -103,7 +100,7 @@ Repasse do vendedor = soma dos itens dele menos a comissão desses itens. Só pe
 
 Cliente do Nordeste compra 1 Mouse (eletrônicos, R$ 120,00) e 1 Livro de JavaScript (livros, R$ 80,00), com `BEMVINDO10` e `PDA15`:
 
-```
+```text
 Subtotal                              R$ 200,00
 (-) BEMVINDO10: 10% de R$ 200,00    - R$  20,00
 (-) PDA15: desconto fixo            - R$  15,00
@@ -120,28 +117,26 @@ Comissão total do marketplace: R$ 21,60
 
 ```
 
-Esse exemplo é validado automaticamente pelos nossos testes automatizados (`npm test`): se alguma regra mudar, a suíte falha.
-
 ### Relatórios
 
 Consideram **somente pedidos confirmados**: faturamento total, quantidade de pedidos, ticket médio, total de descontos, tributos e comissões, faturamento por categoria (valor dos itens antes dos descontos), repasse por vendedor (bruto, comissão e valor a repassar) e top 3 produtos mais vendidos.
 
 ## Estrutura de pastas
 
-```
+```text
 .
 ├── index.js                  # ponto de entrada: abre o menu
 ├── package.json              # "type": "module"
 ├── src/
 │   ├── cli/                  # menus e interação com o usuário
-│   ├── config/               # regras de negócio centralizadas (regras.js)
+│   ├── config/               # regras de negócio centralizadas
 │   ├── data/                 # seed.js e seedCupons.js
 │   ├── models/               # Cliente, Vendedor, Produto, CupomDesconto, Estoque, Pedido
 │   ├── schemas/              # validações estruturadas com Zod
 │   ├── services/             # Marketplace.js e relatorios.js
 │   └── tests/                # testes automatizados com npm test
 └── docs/
-    └── imgs/                 # prints e recursos visuais do projeto
+    └── img/                  # prints e recursos visuais do projeto
 
 ```
 
@@ -167,21 +162,24 @@ Consideram **somente pedidos confirmados**: faturamento total, quantidade de ped
 ## Prints do Terminal
 
 **Menu Principal:**
-![Menu principal](./docs/imgs/1-Menu_Mercadoagil.png)
 
+![Menu principal](./docs/img/1-Menu_Mercadoagil.png)
 
 **Produtos Disponíveis:**
-![Produtos disponíveis](./docs/imgs/2-Produtos.png)
+
+![Produtos disponíveis](./docs/img/2-Produtos.png)
 
 **Resumo do Pedido (Exemplo de R$ 193,00):**
-![Resumo do pedido](./docs/imgs/3-Resumo_pedido.png)
+
+![Resumo do pedido](./docs/img/3-Resumo_pedido.png)
 
 **Relatório de Repasse por Vendedor:**
-![Repasse por vendedor](./docs/imgs/4-Repasse.png)
+
+![Repasse por vendedor](./docs/img/4-Repasse.png)
 
 ## Links
 
-* Repositório:https://github.com/BrunaStefany/mercadoagil
+* Repositório: https://github.com/BrunaStefany/mercadoagil
 * Post no LinkedIn: [Link do Post]
 
 ## Licença
@@ -189,3 +187,4 @@ Consideram **somente pedidos confirmados**: faturamento total, quantidade de ped
 MIT. Veja o arquivo `LICENSE`.
 
 ```
+
