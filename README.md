@@ -179,7 +179,7 @@ Consideram **somente pedidos confirmados**: faturamento total, quantidade de ped
 ## Links
 
 * Repositório: https://github.com/BrunaStefany/mercadoagil
-* Post no LinkedIn: [Link do Post]
+* Post no LinkedIn:https://lnkd.in/p/deWfCyUZ
 
 ## Licença
 
