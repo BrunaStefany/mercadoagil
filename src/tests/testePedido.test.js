@@ -1,6 +1,6 @@
-import { Estoque } from './src/models/Estoque.js';
-import { Pedido } from './src/models/Pedido.js';
-import { CupomDesconto } from './src/models/CupomDesconto.js';
+import { Estoque } from '../models/Estoque.js';
+import { Pedido } from '../models/Pedido.js';
+import { CupomDesconto } from '../models/CupomDesconto.js';
 
 const mouse = { produtoId: 1, nome: 'Mouse', quantidade: 1, precoUnitario: 120, categoria: 'eletronicos', vendedorId: 1 };
 const livro = { produtoId: 2, nome: 'Livro de JavaScript', quantidade: 1, precoUnitario: 80, categoria: 'livros', vendedorId: 2 };

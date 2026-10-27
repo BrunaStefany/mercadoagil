@@ -4,7 +4,13 @@ import { Estoque } from '../models/Estoque.js';
 import { Pedido } from '../models/Pedido.js';
 import { Produto } from '../models/Produto.js';
 import { Vendedor } from '../models/vendedor.js';
-import { criarCuponsSeed } from '../data/seedCupons.js';
+import {
+  clientes,
+  cupons,
+  estoqueInicial,
+  produtos,
+  vendedores,
+} from '../data/seed.js';
 import { clienteSchema } from '../schemas/clienteSchema.js';
 import { cupomSchema } from '../schemas/cupomSchema.js';
 import { produtoSchema } from '../schemas/produtoSchema.js';
@@ -40,11 +46,59 @@ export class Marketplace {
   #estoque = new Estoque();
   #proximoId = { cliente: 1, vendedor: 1, produto: 1, cupom: 1, pedido: 1 };
 
-  constructor() {
-    for (const cupom of criarCuponsSeed()) {
+  constructor({ carregarDadosIniciais = false } = {}) {
+    for (const modelo of cupons) {
       const id = this.#proximoId.cupom++;
-      this.#cupons.set(id, { id, modelo: cupom, saida: () => ({ id, ...cupom.toJSON() }) });
+      this.#cupons.set(id, { id, modelo, saida: () => ({ id, ...modelo.toJSON() }) });
     }
+
+    if (!carregarDadosIniciais) return;
+
+    for (const cliente of clientes) {
+      const { id } = cliente;
+      const modelo = new Cliente(cliente);
+      this.#clientes.set(id, {
+        id,
+        modelo,
+        saida: () => ({ id, nome: modelo.nome, email: modelo.email, regiao: modelo.regiao }),
+      });
+    }
+
+    for (const vendedor of vendedores) {
+      const { id } = vendedor;
+      const modelo = new Vendedor(vendedor);
+      this.#vendedores.set(id, {
+        id,
+        modelo,
+        saida: () => ({ id, nomeLoja: modelo.nomeLoja, cnpj: modelo.cnpj, email: modelo.email }),
+      });
+    }
+
+    for (const produto of produtos) {
+      const { id } = produto;
+      const modelo = new Produto(produto);
+      this.#produtos.set(id, {
+        id,
+        modelo,
+        saida: () => ({
+          id,
+          nome: modelo.nome,
+          preco: modelo.preco,
+          categoria: modelo.categoria,
+          vendedorId: modelo.vendedorId,
+          estoque: this.#estoque.obterQuantidade(id),
+        }),
+      });
+      this.#estoque.definirQuantidade(id, estoqueInicial[id] ?? 0);
+    }
+
+    this.#proximoId.cliente = this.#proximoIdSeguinte(this.#clientes);
+    this.#proximoId.vendedor = this.#proximoIdSeguinte(this.#vendedores);
+    this.#proximoId.produto = this.#proximoIdSeguinte(this.#produtos);
+  }
+
+  #proximoIdSeguinte(mapa) {
+    return mapa.size === 0 ? 1 : Math.max(...mapa.keys()) + 1;
   }
 
   #criar(tipo, mapa, entrada, schema, construir, saida, verificar = () => null) {
@@ -124,7 +178,31 @@ export class Marketplace {
   }
 
   listarClientes(busca) {
-    return this.#listar(this.#clientes, busca, ['nome', 'email', 'regiao']);
+    if (busca === undefined || !String(busca).trim()) {
+      return this.#listar(this.#clientes, busca, ['nome', 'email', 'regiao']);
+    }
+
+    const texto = String(busca).trim();
+    const textoNormalizado = texto.toLocaleLowerCase('pt-BR');
+    const clientesEncontrados = [...this.#clientes.values()]
+      .filter(({ modelo }) => {
+        const correspondeAoTexto = ['nome', 'email', 'regiao'].some((campo) =>
+          String(modelo[campo] ?? '').toLocaleLowerCase('pt-BR').includes(textoNormalizado)
+        );
+        return correspondeAoTexto || modelo.cpf === texto;
+      })
+      .map(({ id, modelo }) => {
+        const { cpf, ...clienteSemCpf } = {
+          id,
+          nome: modelo.nome,
+          email: modelo.email,
+          regiao: modelo.regiao,
+          cpf: modelo.cpf,
+        };
+        return clienteSemCpf;
+      });
+
+    return { ok: true, dados: clientesEncontrados };
   }
 
   buscarCliente(id) { return this.#obter(this.#clientes, id, 'Cliente'); }
@@ -404,6 +482,67 @@ export class Marketplace {
     this.#proximoId.pedido++;
     this.#pedidos.set(id, pedido);
     return confirmacao;
+  }
+
+  criarPedidoRascunho(clienteId) {
+    const cliente = this.#clientes.get(Number(clienteId));
+    if (!cliente) return erro('O cliente informado não foi encontrado.');
+
+    const id = this.#proximoId.pedido++;
+    const pedido = new Pedido({
+      id,
+      clienteId: cliente.id,
+      regiao: cliente.modelo.regiao,
+      estoque: this.#estoque,
+    });
+    this.#pedidos.set(id, pedido);
+    return { ok: true, dados: { id, status: pedido.status, clienteId: cliente.id } };
+  }
+
+  adicionarItemPedido(pedidoId, produtoId, quantidade) {
+    const pedido = this.#pedidos.get(Number(pedidoId));
+    if (!pedido) return erro('Pedido não encontrado.');
+    const produto = this.#produtos.get(Number(produtoId));
+    if (!produto) return erro('Produto não encontrado.');
+
+    const resposta = pedido.adicionarItem({
+      produtoId: Number(produtoId),
+      quantidade: Number(quantidade),
+      nome: produto.modelo.nome,
+      categoria: produto.modelo.categoria,
+      vendedorId: produto.modelo.vendedorId,
+      precoUnitario: produto.modelo.preco,
+    });
+    return resposta.ok ? pedido.resumo() : resposta;
+  }
+
+  aplicarCupomPedido(pedidoId, codigo) {
+    const pedido = this.#pedidos.get(Number(pedidoId));
+    if (!pedido) return erro('Pedido não encontrado.');
+    if (typeof codigo !== 'string' || !codigo.trim()) return erro('Informe o código do cupom.');
+
+    const registro = [...this.#cupons.values()]
+      .find(({ modelo }) => modelo.codigo === codigo.trim().toUpperCase());
+    if (!registro) return erro(`Cupom ${codigo} não encontrado.`);
+    const resposta = pedido.aplicarCupom(registro.modelo);
+    return resposta.ok ? pedido.resumo() : resposta;
+  }
+
+  resumoPedido(pedidoId) {
+    const pedido = this.#pedidos.get(Number(pedidoId));
+    return pedido ? pedido.resumo() : erro('Pedido não encontrado.');
+  }
+
+  confirmarPedido(pedidoId) {
+    const pedido = this.#pedidos.get(Number(pedidoId));
+    if (!pedido) return erro('Pedido não encontrado.');
+    return pedido.confirmar();
+  }
+
+  cancelarPedido(pedidoId) {
+    const pedido = this.#pedidos.get(Number(pedidoId));
+    if (!pedido) return erro('Pedido não encontrado.');
+    return pedido.cancelar();
   }
 
   listarPedidos() {

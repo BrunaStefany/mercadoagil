@@ -1,5 +1,5 @@
 // Rode com: node teste-cupom.js   (precisa de: npm install zod, e "type": "module" no package.json)
-import { CupomDesconto } from './src/models/CupomDesconto.js';
+import { CupomDesconto } from '../models/CupomDesconto.js';
 
 const daqui = (dias) => new Date(Date.now() + dias * 86_400_000);
 
@@ -34,8 +34,8 @@ const v20 = CupomDesconto.criar({ codigo: 'VINTE', tipo: 'percentual', valor: 20
 console.log(CupomDesconto.calcularDescontos([v20, p], 100)); // 20 + 10, limitadoPeloTeto: true
 
 // ---- CRUD + seed ----
-import { criarCuponsSeed } from './src/data/seedCupons.js';
-import { cadastrarCupom, listarCupons, buscarCupom, excluirCupom } from './src/services/cupons.js';
+import { criarCuponsSeed } from '../data/seedCupons.js';
+import { cadastrarCupom, listarCupons, buscarCupom, excluirCupom } from '../services/cupons.js';
 
 let cupons = criarCuponsSeed();
 console.log('Seed:', listarCupons(cupons).dados.map((c) => c.codigo)); // 4 cupons

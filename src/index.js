@@ -59,7 +59,7 @@ const lerJson = (req) => new Promise((resolve, reject) => {
   req.on('error', reject);
 });
 
-export function criarServidor(marketplace = new Marketplace()) {
+export function criarServidor(marketplace = new Marketplace({ carregarDadosIniciais: true })) {
   return createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
     const partes = url.pathname.split('/').filter(Boolean);

@@ -177,6 +177,55 @@ describe('Marketplace', () => {
     assert.equal(pedido.dados.status, 'confirmado');
   });
 
+  test('calcula exatamente o pedido da rubrica com os dois cupons', () => {
+    const marketplace = new Marketplace({ carregarDadosIniciais: true });
+
+    const pedido = marketplace.criarPedido({
+      clienteId: 1,
+      itens: [
+        { produtoId: 1, quantidade: 1 },
+        { produtoId: 4, quantidade: 1 },
+      ],
+      cupons: ['BEMVINDO10', 'PDA15'],
+    });
+
+    assert.equal(pedido.ok, true);
+    assert.equal(pedido.dados.total, 193);
+    assert.equal(pedido.dados.frete, 28);
+    assert.deepEqual(
+      pedido.dados.repasses.map(({ vendedorId, valorRepasse }) => ({ vendedorId, valorRepasse })),
+      [
+        { vendedorId: 1, valorRepasse: 110.4 },
+        { vendedorId: 2, valorRepasse: 68 },
+      ]
+    );
+  });
+
+  test('não baixa estoque quando a confirmação não atende todos os itens', () => {
+    const marketplace = new Marketplace({ carregarDadosIniciais: true });
+    const rascunho = marketplace.criarPedidoRascunho(1);
+
+    assert.equal(rascunho.ok, true);
+    assert.equal(marketplace.adicionarItemPedido(rascunho.dados.id, 2, 2).ok, true);
+
+    const confirmacao = marketplace.confirmarPedido(rascunho.dados.id);
+
+    assert.equal(confirmacao.ok, false);
+    assert.match(confirmacao.erros.join(' '), /Estoque insuficiente/i);
+    assert.equal(marketplace.listarProdutos('Teclado').dados[0].estoque, 1);
+  });
+
+  test('busca cliente por CPF sem expor o CPF na resposta', () => {
+    const marketplace = new Marketplace({ carregarDadosIniciais: true });
+
+    const busca = marketplace.listarClientes('12345678909');
+
+    assert.equal(busca.ok, true);
+    assert.equal(busca.dados.length, 1);
+    assert.equal(busca.dados[0].nome, 'Ana Souza');
+    assert.equal(busca.dados[0].cpf, undefined);
+  });
+
   test('exclui registros e rejeita operações inválidas', () => {
     const { marketplace, cliente, vendedor, produto } = criarDadosBase();
 
