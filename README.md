@@ -1,4 +1,3 @@
- ```markdown
 # 🛒 MercadoÁgil: Microsserviço de Pedidos
 
 ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)
@@ -185,6 +184,3 @@ Consideram **somente pedidos confirmados**: faturamento total, quantidade de ped
 ## Licença
 
 MIT. Veja o arquivo `LICENSE`.
-
-```
-
